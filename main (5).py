@@ -42,6 +42,24 @@ def main(page: ft.Page):
                 result = math.sin(math.radians(n1))  # Преобразуем в радианы
             elif operation == "cos":
                 result = math.cos(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "tan":
+                result = math.tan(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "sinh":
+                result = math.sinh(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "cosh":
+                result = math.cosh(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "tanh":
+                result = math.tanh(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "asinh":
+                result = math.asinh(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "acosh":
+                result = math.acosh(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "atanh":
+                result = math.atanh(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "fabs":
+                result = math.fabs(math.radians(n1))  # Преобразуем в радианы
+            elif operation == "pi":
+                result = math.pi
             else:
                 result = "Ошибка: неизвестная операция"
 
@@ -53,7 +71,7 @@ def main(page: ft.Page):
 
     # Кнопки операций
     buttons = [
-        ft.ElevatedButton(op, on_click=calculate) for op in ["+", "-", "*", "/", "sqrt", "^", "sin", "cos"]
+        ft.ElevatedButton(op, on_click=calculate) for op in ["+", "-", "*", "/", "sqrt", "^", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "fabs", "pi"]
     ]
 
     # Добавляем все элементы в окно
