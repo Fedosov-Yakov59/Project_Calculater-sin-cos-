@@ -3,13 +3,14 @@ import math
 
 def main(page: ft.Page):
     page.title = "Калькулятор"
+    page.bgcolor = ft.colors.GREY_100  # Устанавливаем фоновый цвет
 
     # Поля для ввода чисел
-    num1 = ft.TextField(label="Число 1", width=150)
-    num2 = ft.TextField(label="Число 2", width=150)
+    num1 = ft.TextField(label="Число 1", width=150, bgcolor=ft.colors.WHITE)
+    num2 = ft.TextField(label="Число 2", width=150, bgcolor=ft.colors.WHITE)
 
     # Поле для вывода результата
-    result_text = ft.Text("Результат: ")
+    result_text = ft.Text("Результат: ", color=ft.colors.BLACK)
 
     # Функция обработки нажатия кнопок
     def calculate(e):
@@ -80,11 +81,11 @@ def main(page: ft.Page):
         ft.ElevatedButton(op, on_click=calculate) for op in ["+", "-", "*", "/", "sqrt", "^", "sin", "cos", "tan",  "asin", "acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "fabs", "pi"]
     ]
 
+    # Добавляем изображения коал
+    koala_image = ft.Image(src="https://example.com/koala.png", width=100, height=100)  # Замените на реальный URL изображения коалы
+
     # Добавляем все элементы в окно
     page.add(
+        koala_image,
         num1, num2,
-        ft.Row(buttons, alignment=ft.MainAxisAlignment.CENTER),
-        result_text
-    )
-
-ft.app(target=main)
+        ft
