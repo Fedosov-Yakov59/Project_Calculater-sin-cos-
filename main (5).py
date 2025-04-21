@@ -1,3 +1,28 @@
+import telebot
+from telebot import types
+
+# Создаем экземпляр бота
+API_TOKEN = '8125049217:AAFXtqLbWzp22Snc8a-s7DvOGUi36c1ynOw'
+bot = telebot.TeleBot(8125049217:AAFXtqLbWzp22Snc8a-s7DvOGUi36c1ynOw)
+
+# Обработчик команды /start
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Здравствуйте!")
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    calculator_button = types.KeyboardButton("Калькулятор")
+    suggest_button = types.KeyboardButton("Предложить новые функции")
+    markup.add(calculator_button, suggest_button)
+    bot.send_message(message.chat.id, "Выберите опцию:", reply_markup=markup)
+
+# Обработчик нажатия кнопки "Калькулятор"
+@bot.message_handler(func=lambda message: message.text == "Калькулятор")
+def start_calculator(message):
+    # Здесь вы можете вызвать функцию для запуска вашего калькулятора
+    bot.send_message(message.chat.id, "Запускаем калькулятор...")
+
+# Запуск бота
+bot.polling()
 import flet as ft
 import math
 
@@ -71,21 +96,3 @@ def main(page: ft.Page):
                 result = "Ошибка: неизвестная операция"
 
             result_text.value = f"Результат: {result}"  # Обновляем результат
-        except ValueError:
-            result_text.value = "Ошибка: введите числа!"
-
-        page.update()  # Обновляем интерфейс
-
-    # Кнопки операций
-    buttons = [
-        ft.ElevatedButton(op, on_click=calculate) for op in ["+", "-", "*", "/", "sqrt", "^", "sin", "cos", "tan",  "asin", "acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "fabs", "pi"]
-    ]
-
-    # Добавляем изображения коал
-    koala_image = ft.Image(src="https://example.com/koala.png", width=100, height=100)  # Замените на реальный URL изображения коалы
-
-    # Добавляем все элементы в окно
-    page.add(
-        koala_image,
-        num1, num2,
-        ft
