@@ -46,28 +46,40 @@ def main(page: ft.Page):
             elif operation == "tan":
                 result = math.tan(math.radians(n1))  # Преобразуем в радианы
             elif operation == "asin":
-                result = math.asin(math.radians(n1))  # Преобразуем в радианы
+                result = math.degrees(math.asin(n1))  # Преобразуем в градусы
             elif operation == "acos":
-                result = math.acos(math.radians(n1))  # Преобразуем в радианы
+                result = math.degrees(math.acos(n1))  # Преобразуем в градусы
             elif operation == "atan":
-                result = math.atan(math.radians(n1))  # Преобразуем в радианы
+                result = math.degrees(math.atan(n1))  # Преобразуем в градусы
             elif operation == "sinh":
-                result = math.sinh(math.radians(n1))  # Преобразуем в радианы
+                result = math.sinh(n1)  # Не нужно преобразование
             elif operation == "cosh":
-                result = math.cosh(math.radians(n1))  # Преобразуем в радианы
+                result = math.cosh(n1)  # Не нужно преобразование
             elif operation == "tanh":
-                result = math.tanh(math.radians(n1))  # Преобразуем в радианы
+                result = math.tanh(n1)  # Не нужно преобразование
             elif operation == "asinh":
-                result = math.asinh(math.radians(n1))  # Преобразуем в радианы
+                result = math.asinh(n1)  # Не нужно преобразование
             elif operation == "acosh":
-                result = math.acosh(math.radians(n1))  # Преобразуем в радианы
+                result = math.acosh(n1)  # Не нужно преобразование
             elif operation == "atanh":
-                result = math.atanh(math.radians(n1))  # Преобразуем в радианы
+                result = math.atanh(n1)  # Не нужно преобразование
             elif operation == "fabs":
-                result = math.fabs(math.radians(n1))  # Преобразуем в радианы
+                result = math.fabs(n1)  # Не нужно преобразование
             elif operation == "pi":
                 result = math.pi
             else:
                 result = "Ошибка: неизвестная операция"
 
             result_text.value = f"Результат: {result}"  # Обновляем результат
+        except ValueError:
+            result_text.value = "Ошибка: неверный ввод"
+
+    # Кнопки операций
+    operations = ["+", "-", "*", "/", "sqrt", "^", "sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "fabs", "pi"]
+    buttons = [ft.ElevatedButton(op, on_click=calculate) for op in operations]
+
+    # Добавляем элементы на страницу
+    page.add(num1, num2, *buttons, result_text)
+
+# Запуск приложения
+ft.app(target=main)
