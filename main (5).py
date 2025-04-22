@@ -1,12 +1,12 @@
 import telebot
 from telebot import types
-import threading
+import multiprocessing
 from Calculater import main  # Импортируем функцию main из файла калькулятора
 import flet as ft
 
 # Создаем экземпляр бота
-API_TOKEN = '8125049217:AAFXtqLbWzp22Snc8a-s7DvOGUi36c1ynOw'
-bot = telebot.TeleBot()
+API_TOKEN = '8125049217:AAFXtqLbWzp22Snc8a-s7DvOGUi36c1ynOw'  # Замените на ваш токен
+bot = telebot.TeleBot(API_TOKEN)
 
 # Обработчик команды /start
 @bot.message_handler(commands=['start'])
@@ -22,11 +22,12 @@ def send_welcome(message):
 @bot.message_handler(func=lambda message: message.text == "Калькулятор")
 def start_calculator(message):
     bot.send_message(message.chat.id, "Запускаем калькулятор...")
-    # Запускаем калькулятор в отдельном потоке
-    threading.Thread(target=run_calculator).start()
+    # Запускаем калькулятор в отдельном процессе
+    multiprocessing.Process(target=run_calculator).start()
 
 def run_calculator():
     ft.app(target=main)  # Запускаем приложение Flet
 
 # Запуск бота
-bot.polling() 
+if __name__ == "__main__":
+    bot.polling()
