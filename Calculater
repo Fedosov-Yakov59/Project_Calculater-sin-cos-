@@ -67,6 +67,17 @@ def main(page: ft.Page):
                 result = math.fabs(n1)  # Не нужно преобразование
             elif operation == "pi":
                 result = math.pi
+            elif operation == "log":
+                n2 = float(num2.value)
+                if n2 > 0:
+                    result = math.log(n1, n2)  # Логарифм по основанию n2
+                else:
+                    result = "Ошибка: основание логарифма должно быть больше 0"
+            elif operation == "exp":
+                result = math.exp(n1)  # Экспонента
+            elif operation == "mod":
+                n2 = float(num2.value)
+                result = n1 % n2  # Остаток от деления
             else:
                 result = "Ошибка: неизвестная операция"
 
@@ -75,8 +86,10 @@ def main(page: ft.Page):
             result_text.value = "Ошибка: неверный ввод"
 
     # Кнопки операций
-    operations = ["+", "-", "*", "/", "sqrt", "^", "sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "fabs", "pi"]
+    operations = ["+", "-", "*", "/", "sqrt", "^", "sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "fabs", "pi", "log", "exp", "mod"]
     buttons = [ft.ElevatedButton(op, on_click=calculate) for op in operations]
+
+
 
     # Добавляем элементы на страницу
     page.add(num1, num2, *buttons, result_text)
