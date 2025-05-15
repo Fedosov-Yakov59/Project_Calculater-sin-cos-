@@ -3,14 +3,13 @@ import math
 
 def main(page: ft.Page):
     page.title = "Калькулятор"
-    page.bgcolor = ft.colors.GREY_100  # Устанавливаем фоновый цвет
 
     # Поля для ввода чисел
-    num1 = ft.TextField(label="Число 1", width=150, bgcolor=ft.colors.WHITE)
-    num2 = ft.TextField(label="Число 2", width=150, bgcolor=ft.colors.WHITE)
+    num1 = ft.TextField(label="Число 1", width=150)
+    num2 = ft.TextField(label="Число 2", width=150)
 
     # Поле для вывода результата
-    result_text = ft.Text("Результат: ", color=ft.colors.BLACK)
+    result_text = ft.Text("Результат: ")
 
     # Функция обработки нажатия кнопок
     def calculate(e):
