@@ -3,6 +3,9 @@ import math
 
 def main(page: ft.Page):
     page.title = "Калькулятор"
+    page.window_width = 400  # Устанавливаем ширину окна
+    page.window_height = 600  # Устанавливаем высоту окна
+    page.padding = 10  # Добавляем отступы по краям
 
     # Поля для ввода чисел
     num1 = ft.TextField(label="Число 1", width=150)
@@ -84,14 +87,35 @@ def main(page: ft.Page):
         except ValueError:
             result_text.value = "Ошибка: неверный ввод"
 
-    # Кнопки операций
-    operations = ["+", "-", "*", "/", "sqrt", "^", "sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "fabs", "pi", "log", "exp", "mod"]
-    buttons = [ft.ElevatedButton(op, on_click=calculate) for op in operations]
+    # Кнопки операций с уменьшенным размером
+    operations = ["+", "-", "*", "/", "sqrt", "^", 
+                 "sin", "cos", "tan", "asin", "acos", "atan", 
+                 "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", 
+                 "fabs", "pi", "log", "exp", "mod"]
+    
+    # Создаем кнопки с фиксированной шириной
+    buttons = [ft.ElevatedButton(
+        op, 
+        on_click=calculate,
+        width=80,
+        height=40
+    ) for op in operations]
 
-
+    # Создаем контейнер Wrap для кнопок
+    wrap_buttons = ft.Wrap(
+        buttons,
+        spacing=10,  # Расстояние между кнопками
+        run_spacing=10,  # Расстояние между рядами
+    )
 
     # Добавляем элементы на страницу
-    page.add(num1, num2, *buttons, result_text)
+    page.add(
+        ft.Column([
+            num1,
+            num2,
+            wrap_buttons,
+            result_text
+        ])
+    )
 
-# Запуск приложения
 ft.app(target=main)
