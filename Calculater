@@ -2,23 +2,51 @@ import flet as ft
 import math
 
 def main(page: ft.Page):
+    # Настройки страницы с серым фоном
     page.title = "Калькулятор"
-    page.window_width = 400  # Устанавливаем ширину окна
-    page.window_height = 600  # Устанавливаем высоту окна
-    page.padding = 10  # Добавляем отступы по краям
+    page.window_width = 400
+    page.window_height = 600
+    page.padding = 10
+    page.bgcolor = "#f0f0f0"  # Светло-серый фон всей страницы
+
+    # Стиль для текстовых полей
+    textfield_style = ft.InputDecoration(
+        border=ft.InputBorder.OUTLINE,
+        border_radius=5,
+        border_color="#cccccc",
+        filled=True,
+        fill_color="white"
+    )
 
     # Поля для ввода чисел
-    num1 = ft.TextField(label="Число 1", width=150)
-    num2 = ft.TextField(label="Число 2", width=150)
+    num1 = ft.TextField(
+        label="Число 1", 
+        width=150,
+        border_radius=5,
+        border_color="#cccccc",
+        bgcolor="white"
+    )
+    num2 = ft.TextField(
+        label="Число 2", 
+        width=150,
+        border_radius=5,
+        border_color="#cccccc",
+        bgcolor="white"
+    )
 
     # Поле для вывода результата
-    result_text = ft.Text("Результат: ")
+    result_text = ft.Text(
+        "Результат: ",
+        size=16,
+        weight="bold",
+        color="#333333"
+    )
 
     # Функция обработки нажатия кнопок
     def calculate(e):
         try:
-            n1 = float(num1.value)  # Получаем первое число
-            operation = e.control.text  # Узнаем, какую кнопку нажали
+            n1 = float(num1.value)
+            operation = e.control.text
 
             # Вычисляем результат
             if operation == "+":
@@ -42,80 +70,92 @@ def main(page: ft.Page):
                 n2 = float(num2.value)
                 result = n1 ** n2
             elif operation == "sin":
-                result = math.sin(math.radians(n1))  # Преобразуем в радианы
+                result = math.sin(math.radians(n1))
             elif operation == "cos":
-                result = math.cos(math.radians(n1))  # Преобразуем в радианы
+                result = math.cos(math.radians(n1))
             elif operation == "tan":
-                result = math.tan(math.radians(n1))  # Преобразуем в радианы
+                result = math.tan(math.radians(n1))
             elif operation == "asin":
-                result = math.degrees(math.asin(n1))  # Преобразуем в градусы
+                result = math.degrees(math.asin(n1))
             elif operation == "acos":
-                result = math.degrees(math.acos(n1))  # Преобразуем в градусы
+                result = math.degrees(math.acos(n1))
             elif operation == "atan":
-                result = math.degrees(math.atan(n1))  # Преобразуем в градусы
+                result = math.degrees(math.atan(n1))
             elif operation == "sinh":
-                result = math.sinh(n1)  # Не нужно преобразование
+                result = math.sinh(n1)
             elif operation == "cosh":
-                result = math.cosh(n1)  # Не нужно преобразование
+                result = math.cosh(n1)
             elif operation == "tanh":
-                result = math.tanh(n1)  # Не нужно преобразование
+                result = math.tanh(n1)
             elif operation == "asinh":
-                result = math.asinh(n1)  # Не нужно преобразование
+                result = math.asinh(n1)
             elif operation == "acosh":
-                result = math.acosh(n1)  # Не нужно преобразование
+                result = math.acosh(n1)
             elif operation == "atanh":
-                result = math.atanh(n1)  # Не нужно преобразование
+                result = math.atanh(n1)
             elif operation == "fabs":
-                result = math.fabs(n1)  # Не нужно преобразование
+                result = math.fabs(n1)
             elif operation == "pi":
                 result = math.pi
             elif operation == "log":
                 n2 = float(num2.value)
                 if n2 > 0:
-                    result = math.log(n1, n2)  # Логарифм по основанию n2
+                    result = math.log(n1, n2)
                 else:
                     result = "Ошибка: основание логарифма должно быть больше 0"
             elif operation == "exp":
-                result = math.exp(n1)  # Экспонента
+                result = math.exp(n1)
             elif operation == "mod":
                 n2 = float(num2.value)
-                result = n1 % n2  # Остаток от деления
+                result = n1 % n2
             else:
                 result = "Ошибка: неизвестная операция"
 
-            result_text.value = f"Результат: {result}"  # Обновляем результат
+            result_text.value = f"Результат: {result}"
         except ValueError:
             result_text.value = "Ошибка: неверный ввод"
 
-    # Кнопки операций с уменьшенным размером
+    # Кнопки операций
     operations = ["+", "-", "*", "/", "sqrt", "^", 
                  "sin", "cos", "tan", "asin", "acos", "atan", 
                  "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", 
                  "fabs", "pi", "log", "exp", "mod"]
     
-    # Создаем кнопки с фиксированной шириной
+    # Создаем кнопки с серым стилем
     buttons = [ft.ElevatedButton(
         op, 
         on_click=calculate,
         width=80,
-        height=40
+        height=40,
+        bgcolor="#e0e0e0",  # Серый фон кнопки
+        color="#333333",    # Темно-серый текст
+        style=ft.ButtonStyle(
+            shape=ft.RoundedRectangleBorder(radius=5),
+            side=ft.BorderSide(1, "#cccccc")
+        )
     ) for op in operations]
 
-    # Создаем контейнер Wrap для кнопок
+    # Контейнер для кнопок
     wrap_buttons = ft.Wrap(
         buttons,
-        spacing=10,  # Расстояние между кнопками
-        run_spacing=10,  # Расстояние между рядами
+        spacing=10,
+        run_spacing=10,
     )
 
-    # Добавляем элементы на страницу
-    page.add(
-        ft.Column([
+    # Основной контейнер с серым фоном
+    main_container = ft.Container(
+        content=ft.Column([
             num1,
             num2,
             wrap_buttons,
             result_text
-        ])
+        ]),
+        padding=10,
+        border_radius=10,
+        bgcolor="#f5f5f5",  # Светло-серый фон контейнера
     )
+
+    # Добавляем элементы на страницу
+    page.add(main_container)
 
 ft.app(target=main)
