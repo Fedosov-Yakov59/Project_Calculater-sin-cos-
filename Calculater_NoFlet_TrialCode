@@ -1,0 +1,230 @@
+import telebot
+from telebot import types
+import sqlite3
+import math
+
+# Создаем экземпляр бота
+API_TOKEN = '8125049217:AAFXtqLbWzp22Snc8a-s7DvOGUi36c1ynOw'  # Замените на ваш токен
+bot = telebot.TeleBot(API_TOKEN)
+
+# Создаем или подключаемся к базе данных
+conn = sqlite3.connect('suggestions.db', check_same_thread=False)
+cursor = conn.cursor()
+cursor.execute('''CREATE TABLE IF NOT EXISTS suggestions (id INTEGER PRIMARY KEY, suggestion TEXT)''')
+conn.commit()
+
+# Глобальные переменные для хранения состояний калькулятора
+user_data = {}
+
+class CalculatorState:
+    def __init__(self):
+        self.num1 = None
+        self.num2 = None
+        self.operation = None
+        self.waiting_for_num = False
+
+# Обработчик команды /start
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Здравствуйте! Это бот с калькулятором.")
+    show_main_menu(message.chat.id)
+
+def show_main_menu(chat_id):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    calculator_button = types.KeyboardButton("Калькулятор")
+    suggest_button = types.KeyboardButton("Предложить новые функции")
+    markup.add(calculator_button, suggest_button)
+    bot.send_message(chat_id, "Выберите опцию:", reply_markup=markup)
+
+# Обработчик нажатия кнопки "Калькулятор"
+@bot.message_handler(func=lambda message: message.text == "Калькулятор")
+def start_calculator(message):
+    chat_id = message.chat.id
+    user_data[chat_id] = CalculatorState()
+    
+    markup = types.InlineKeyboardMarkup()
+    
+    # Первый ряд кнопок
+    row1 = [
+        types.InlineKeyboardButton("7", callback_data="num_7"),
+        types.InlineKeyboardButton("8", callback_data="num_8"),
+        types.InlineKeyboardButton("9", callback_data="num_9"),
+        types.InlineKeyboardButton("/", callback_data="op_/")
+    ]
+    
+    # Второй ряд кнопок
+    row2 = [
+        types.InlineKeyboardButton("4", callback_data="num_4"),
+        types.InlineKeyboardButton("5", callback_data="num_5"),
+        types.InlineKeyboardButton("6", callback_data="num_6"),
+        types.InlineKeyboardButton("*", callback_data="op_*")
+    ]
+    
+    # Третий ряд кнопок
+    row3 = [
+        types.InlineKeyboardButton("1", callback_data="num_1"),
+        types.InlineKeyboardButton("2", callback_data="num_2"),
+        types.InlineKeyboardButton("3", callback_data="num_3"),
+        types.InlineKeyboardButton("-", callback_data="op_-")
+    ]
+    
+    # Четвертый ряд кнопок
+    row4 = [
+        types.InlineKeyboardButton("0", callback_data="num_0"),
+        types.InlineKeyboardButton(".", callback_data="num_."),
+        types.InlineKeyboardButton("=", callback_data="op_="),
+        types.InlineKeyboardButton("+", callback_data="op_+")
+    ]
+    
+    # Дополнительные функции
+    row5 = [
+        types.InlineKeyboardButton("√", callback_data="fun_sqrt"),
+        types.InlineKeyboardButton("^", callback_data="fun_^"),
+        types.InlineKeyboardButton("sin", callback_data="fun_sin"),
+        types.InlineKeyboardButton("cos", callback_data="fun_cos"),
+        types.InlineKeyboardButton("tan", callback_data="fun_tan")
+    ]
+    
+    markup.row(*row1)
+    markup.row(*row2)
+    markup.row(*row3)
+    markup.row(*row4)
+    markup.row(*row5)
+    
+    bot.send_message(chat_id, "Калькулятор:\nТекущее значение: 0", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_callback(call):
+    chat_id = call.message.chat.id
+    data = call.data
+    
+    if chat_id not in user_data:
+        user_data[chat_id] = CalculatorState()
+    
+    calc = user_data[chat_id]
+    
+    try:
+        if data.startswith("num_"):
+            # Обработка цифр
+            digit = data.split("_")[1]
+            
+            if calc.waiting_for_num:
+                if calc.num2 is None:
+                    calc.num2 = digit
+                else:
+                    calc.num2 += digit
+            else:
+                if calc.num1 is None:
+                    calc.num1 = digit
+                else:
+                    calc.num1 += digit
+                    
+        elif data.startswith("op_"):
+            # Обработка операций
+            operation = data.split("_")[1]
+            
+            if operation == "=":
+                if calc.num1 and calc.num2 and calc.operation:
+                    result = calculate(calc.num1, calc.num2, calc.operation)
+                    bot.answer_callback_query(call.id, f"Результат: {result}")
+                    calc.num1 = str(result)
+                    calc.num2 = None
+                    calc.operation = None
+                    calc.waiting_for_num = False
+                else:
+                    bot.answer_callback_query(call.id, "Недостаточно данных для вычисления")
+            else:
+                calc.operation = operation
+                calc.waiting_for_num = True
+                
+        elif data.startswith("fun_"):
+            # Обработка функций
+            function = data.split("_")[1]
+            
+            if calc.num1:
+                try:
+                    n1 = float(calc.num1)
+                    result = apply_function(n1, function)
+                    bot.answer_callback_query(call.id, f"Результат: {result}")
+                    calc.num1 = str(result)
+                    calc.num2 = None
+                    calc.operation = None
+                    calc.waiting_for_num = False
+                except Exception as e:
+                    bot.answer_callback_query(call.id, f"Ошибка: {str(e)}")
+            else:
+                bot.answer_callback_query(call.id, "Введите число сначала")
+        
+        # Обновляем сообщение с текущим состоянием
+        current_value = calc.num2 if calc.waiting_for_num and calc.num2 else calc.num1 if calc.num1 else "0"
+        text = f"Калькулятор:\nТекущее значение: {current_value}"
+        if calc.operation:
+            text += f"\nОперация: {calc.operation}"
+        
+        try:
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=call.message.message_id,
+                text=text,
+                reply_markup=call.message.reply_markup
+            )
+        except:
+            pass
+            
+    except Exception as e:
+        bot.answer_callback_query(call.id, f"Ошибка: {str(e)}")
+
+def calculate(num1, num2, operation):
+    try:
+        n1 = float(num1)
+        n2 = float(num2)
+        
+        if operation == "+":
+            return n1 + n2
+        elif operation == "-":
+            return n1 - n2
+        elif operation == "*":
+            return n1 * n2
+        elif operation == "/":
+            if n2 != 0:
+                return n1 / n2
+            else:
+                return "Ошибка: деление на 0"
+        else:
+            return "Неизвестная операция"
+    except ValueError:
+        return "Ошибка ввода"
+
+def apply_function(num, function):
+    if function == "sqrt":
+        if num >= 0:
+            return math.sqrt(num)
+        else:
+            return "Ошибка: корень из отрицательного числа"
+    elif function == "^":
+        return num * num
+    elif function == "sin":
+        return math.sin(math.radians(num))
+    elif function == "cos":
+        return math.cos(math.radians(num))
+    elif function == "tan":
+        return math.tan(math.radians(num))
+    else:
+        return "Неизвестная функция"
+
+# Обработчик нажатия кнопки "Предложить новые функции"
+@bot.message_handler(func=lambda message: message.text == "Предложить новые функции")
+def suggest_feature(message):
+    bot.send_message(message.chat.id, "Хорошо, напишите её! И Ваша функция будет рассмотрена!")
+    bot.register_next_step_handler(message, save_suggestion)
+
+def save_suggestion(message):
+    suggestion = message.text
+    cursor.execute("INSERT INTO suggestions (suggestion) VALUES (?)", (suggestion,))
+    conn.commit()
+    bot.send_message(message.chat.id, "Спасибо большое за помощь!")
+    show_main_menu(message.chat.id)
+
+# Запуск бота
+if __name__ == "__main__":
+    bot.polling()
