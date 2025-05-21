@@ -4,7 +4,7 @@ import sqlite3
 import math
 
 # Создаем экземпляр бота
-API_TOKEN = '8125049217:AAFXtqLbWzp22Snc8a-s7DvOGUi36c1ynOw'  # Замените на ваш токен
+API_TOKEN = ''  # Замените на ваш токен
 bot = telebot.TeleBot(API_TOKEN)
 
 # Создаем или подключаемся к базе данных
